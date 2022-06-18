@@ -36,6 +36,7 @@ var bangs: OrderedTableRef[string, string]
 
 proc loadBangs(): void =
     bangs = newOrderedTable[string, string]()
+    bangs[""] = "https://www.google.com/search?hl=en&q={q}"
     if not os.fileExists("bangs.txt"):
         writeFile("bangs.txt", bangTemplate)
     for line in lines "bangs.txt":
