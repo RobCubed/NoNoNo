@@ -7,17 +7,25 @@ import std/tables
 import std/os as os
 
 const css = """html{
-  font-family: sans-serif;
-  background: #222222;
-  color: #fff;
-  text-align: center;
-  max-width:800px;
-  margin: auto;
+ font-family: sans-serif;
+ background: #222222;
+ color: #fff;
+ text-align: center;
+ max-width:800px;
+ margin: auto;
 }
 a:link,a:visited{color: chocolate}
-table {margin: auto}
-tr {text-align: center}
-"""
+table {
+ margin:auto;
+ max-width: 800px;
+}
+tr {
+ text-align: center;
+ word-wrap: anywhere
+}
+tr > td:first-child {
+ width: 10em
+}"""
 
 const opensearch = staticRead("opensearch.xml")
 const bangTemplate = staticRead("bangs.txt")
