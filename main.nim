@@ -156,11 +156,14 @@ proc handleSock(client: Socket): void =
             sendBasicResponse(client, 200, opensearch, "application/opensearchdescription+xml")
         of "/search":
             let query = splitWhitespace(decodeUrl(parsed.query), 1)
-            let q = (if len(query) == 1: "" else: query[1])
+            var q = (if len(query) == 1: "" else: query[1])
             var url = bangs[""]
 
             if bangs.hasKey(query[0]):
                 url = bangs[query[0]]
+            else:
+                q = decodeUrl(parsed.query)
+
 
             redirect(client, replace(url, "{q}", encodeUrl(q)))
         of "/reload":
