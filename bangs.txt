@@ -1,0 +1,7 @@
+ https://www.google.com/search?hl=en&q={q}
+!b https://www.bing.com/search?q={q}
+!g https://www.google.com/search?hl=en&q={q}
+!git https://github.com/search?utf8=%E2%9C%93&q={q}
+!w https://en.wikipedia.org/wiki/Special:Search?search={q}
+!y https://www.yandex.ru/yandsearch?text={q}
+!yt https://www.youtube.com/results?search_q={q}

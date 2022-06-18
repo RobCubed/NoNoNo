@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+    <ShortName>NoNoNo!</ShortName>
+    <Description>No! No! No! - Custom bangs for the custom man</Description>
+    <InputEncoding>UTF-8</InputEncoding>
+    <Image width="16" height="16" type="image/x-icon">https://files.catbox.moe/lv64ri.png</Image>
+    <Url type="text/html" template="http://localhost:7878/search?{searchTerms}"/>
+    <!-- <Url type="application/x-suggestions+json" template="[suggestionURL]"/> -->
+    <moz:SearchForm>http://localhost:7878?q={searchTerms}</moz:SearchForm>
+</OpenSearchDescription>
