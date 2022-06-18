@@ -1,5 +1,5 @@
 import std/net as net
-from strutils import splitWhitespace, replace
+from strutils import splitWhitespace, replace, split, toHex, strip
 from std/uri import parseUri, decodeUrl, encodeUrl, decodeQuery
 import std/strformat
 import htmlgen
@@ -75,12 +75,10 @@ proc htmlStart(content: string): string =
         )
     )
 
-proc generateTable(): string =
-    var ret = tr(th("bang"), th("url"), th("delete"))
+iterator generateTable(): string =
+    yield tr(th("bang"), th("url"), th("delete"))
     for bang, url in bangs:
-        ret = ret & tr(td(bang), td(a(url, href=url)), td(a("❌", href= &"/deletebang?{encodeUrl(bang)}")))
-
-    return table(ret, border="1")
+        yield tr(td(bang), td(a(url, href=url)), td(a("❌", href= &"/deletebang?{encodeUrl(bang)}")))
 
 proc sendHeaderOnlyResponse(client: Socket, code: int, headers: varargs[string]):void =
     send(client, &"HTTP/1.1 {code}\r\n")
@@ -104,6 +102,10 @@ proc sendHTML(client: Socket, code: int, data: string): void =
 proc redirect(client: Socket, url: string): void =
     sendHeaderOnlyResponse(client, 301, &"Location: {url}")
 
+proc num2hex(i: string): string =
+    return toHex(len(i)).strip(leading=true, trailing=false, chars = {'0'})
+
+
 proc handleSock(client: Socket): void =
     defer: client.close()
     var buf = ""
@@ -118,22 +120,37 @@ proc handleSock(client: Socket): void =
 
     case parsed.path:
         of "/":
-            sendHTML(client, 200, `div`(
-                    h3("no! no! no!"),
-                    p("custom bangs for the custom man"),
-                    a(button("reload bangs from disk"), href="/reload"),
-                    a(button("save bangs to disk"), href="/save"), br(),
-                    `form`(
-                        class="newBang",
-                        action="/newbang",
-                        p("add a new bang. in the link, '{q}' is replaced with the search query"),
-                        input(`type`="text", placeholder="!bang", name="bang"),
-                        input(`type`="text", placeholder="http://example.com/{q}", name="link"),
-                        button("add")
-                    ),
-                    generateTable()
-                )
-            )
+
+            let data = htmlStart(`div`(
+                                     h3("no! no! no!"),
+                                     p("custom bangs for the custom man"),
+                                     a(button("reload bangs from disk"), href="/reload"),
+                                     a(button("save bangs to disk"), href="/save"), br(),
+                                     `form`(
+                                         class="newBang",
+                                         action="/newbang",
+                                         p("add a new bang. in the link, '{q}' is replaced with the search query"),
+                                         input(`type`="text", placeholder="!bang", name="bang"),
+                                         input(`type`="text", placeholder="http://example.com/{q}", name="link"),
+                                         button("add")
+                                     ),
+                                     table("%%%%BREAK%%%%", border="1")
+                                 ))
+            let split = split(data, "%%%%BREAK%%%%", 1)
+
+            send(client, &"HTTP/1.1 200\r\n")
+            send(client, &"Content-Type: text/html\r\n")
+            send(client, &"Transfer-Encoding: chunked\r\n\r\n")
+            send(client, &"{num2hex(split[0])}\r\n")
+            send(client, split[0] & "\r\n")
+            var length: string
+            for chunk in generateTable():
+                length = num2hex(chunk)
+                send(client, &"{length}\r\n")
+                send(client, &"{chunk}\r\n")
+            send(client, &"{num2hex(split[1])}\r\n")
+            send(client, split[1] & "\r\n")
+
         of "/opensearch.xml":
             sendBasicResponse(client, 200, opensearch, "application/opensearchdescription+xml")
         of "/search":
