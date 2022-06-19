@@ -40,7 +40,7 @@ proc loadBangs(): void =
     if not os.fileExists("bangs.txt"):
         writeFile("bangs.txt", bangTemplate)
     for line in lines "bangs.txt":
-        let spl = splitWhitespace(line)
+        let spl = splitWhitespace(strip(line))
         case len(spl):
             of 0:
                 continue
