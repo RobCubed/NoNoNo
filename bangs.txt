@@ -4,4 +4,4 @@
 !git https://github.com/search?utf8=%E2%9C%93&q={q}
 !w https://en.wikipedia.org/wiki/Special:Search?search={q}
 !y https://www.yandex.ru/yandsearch?text={q}
-!yt https://www.youtube.com/results?search_q={q}
+!yt https://www.youtube.com/results?search_query={q}
